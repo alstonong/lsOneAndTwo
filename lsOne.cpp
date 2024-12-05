@@ -3,6 +3,7 @@ using namespace std;
 
 //code written in Linux
 //code in Linux geschrieben
+//github.com/alstonong/lsOneAndTwo to view commits
 
 class Date
 {
@@ -14,6 +15,7 @@ public:
 	Date(int d, int m, int y); 
 	static Date createDate();
 	int getday(), getmonth(), getyear();
+	void setday(int d), setmonth(int m), setyear(int y);
 };
 
 class Mitarbeiter
@@ -21,16 +23,18 @@ class Mitarbeiter
 private:
 	string name, vorname;
 	Date gebdatum;
-	int beh, ulbtage;
+	int beh, ulbtage, maxulbtage;
 	bool filled;
 
 public: 
 	Mitarbeiter();
-	Mitarbeiter(string n, string v, Date g, int b, int u, bool f); 
+	Mitarbeiter(string n, string v, Date g, int b, int u, int m, bool f); 
 	static Mitarbeiter createMitarbeiter();
 	bool getfilled();
-	string getname(), getvorname(), getgebdatum();
-	int getbeh(), getulbtage();
+	string getname(), getvorname(), getgebdatumstring();
+	int getbeh(), getulbtage(), getmaxulbtage();
+	Date getgebdatum();
+	void setgebdatum(), setbeh(), setulbtage(int u), setmaxulbtage();
 };
 
 //Default constructor needed for creating default Mitarbeiter constructor
@@ -148,17 +152,33 @@ int Date::getyear()
 	return year;
 }
 
-//Default constructor needed for creating Mitarbeiter array
-Mitarbeiter::Mitarbeiter() : name(""), vorname(""), gebdatum(Date()), beh(0), ulbtage(0), filled(false) {}
+void Date::setday(int d)
+{
+	day = d;
+}
 
-Mitarbeiter::Mitarbeiter(string n, string v, Date g, int b, int u, bool f) : name(n), vorname(v), gebdatum(g), beh(b), ulbtage(u), filled(f) {}
+void Date::setmonth(int m)
+{
+	month = m;
+}
+
+void Date::setyear(int y)
+{
+	year = y;
+}
+
+//Default constructor needed for creating Mitarbeiter array
+Mitarbeiter::Mitarbeiter() : name(""), vorname(""), gebdatum(Date()), beh(0), ulbtage(0), maxulbtage(30), filled(false) {}
+
+Mitarbeiter::Mitarbeiter(string n, string v, Date g, int b, int u, int m, bool f) : name(n), vorname(v), gebdatum(g), beh(b), ulbtage(u), maxulbtage(m), filled(f) {}; 
 
 Mitarbeiter Mitarbeiter::createMitarbeiter()
 {
 	string n, v;
 	Date g;
 	int b;
-	int u = 30;
+	int u = 0;
+	int m = 30;
 	bool f = true;
 
 	cout << "Mitarbeiter surname(family name): ";
@@ -166,10 +186,11 @@ Mitarbeiter Mitarbeiter::createMitarbeiter()
 	cout << "Mitarbeiter first name: ";
 	cin >> v;
 	cout << "Mitarbeiter date of birth: " << endl;
-	Date d = Date::createDate();
+	g = Date::createDate();
+
 	do 
 	{
-		cout << "Mitarbeiter level of disability(in percentage[no more than 100%]): ";
+		cout << "Mitarbeiter degree of disability(in percentage[no more than 100%]): ";
 		cin >> b;
 		if (b < 0 || b > 100)
 		{
@@ -177,13 +198,13 @@ Mitarbeiter Mitarbeiter::createMitarbeiter()
 		}
 		else
 		{
-			cout << "New Mitarbeiter added." << endl;
+			cout << "New Mitarbeiter added." << endl << endl;
 			break;
 		}
 	}
 	while(true);
 
-	return Mitarbeiter(n, v, g, b, u, f);
+	return Mitarbeiter(n, v, g, b, u, m, f);
 }
 
 string Mitarbeiter::getname()
@@ -196,7 +217,7 @@ string Mitarbeiter::getvorname()
 	return vorname;
 }
 
-string Mitarbeiter::getgebdatum()
+string Mitarbeiter::getgebdatumstring()
 {
 	//to_string was used to convert int to string. Converting int to char would work but would require 
 	//use of std::string(1, char) to convert to string (which might not be accepted) OR use of char 
@@ -217,15 +238,88 @@ int Mitarbeiter::getulbtage()
 	return ulbtage;
 }
 
+Date Mitarbeiter::getgebdatum()
+{
+	return gebdatum;
+}
+
 bool Mitarbeiter::getfilled()
 {
 	return filled;
 }
 
+void Mitarbeiter::setgebdatum()
+{
+	gebdatum = Date::createDate();
+	cout << "Date of birth updated." << endl << endl;
+}
+
+void Mitarbeiter::setbeh()
+{
+	int b;
+	do 
+	{
+		cout << "Mitarbeiter degree of disability(in percentage[no more than 100%]): ";
+		cin >> b;
+		if (b < 0 || b > 100)
+		{
+			cout << "Mitarbeiter disability can only be between 0 and 100 percent." << endl;
+		}
+		else
+		{
+			cout << "Degree of disability updated." << endl << endl;
+			break;
+		}
+	}
+	while(true);
+	beh = b;
+}
+
+void Mitarbeiter::setulbtage(int u)
+{
+	ulbtage = u;
+}
+
+void Mitarbeiter::setmaxulbtage()
+{
+	if (gebdatum.getyear() + 50 > 2023)
+	{
+		if (beh > 49)
+		{
+			maxulbtage = 37;
+		}
+		else
+		{
+			maxulbtage = 32;
+		}
+	}
+	else
+	{
+		if (beh > 49)
+		{
+			maxulbtage = 35;
+		}
+		else
+		{
+			maxulbtage = 30;
+		}
+	}
+}
+
+int Mitarbeiter::getmaxulbtage()
+{
+	return maxulbtage;
+}
+
 Mitarbeiter mitarbeiter[500];
 void addmittoarray();
 int searchmitbyname();
+void editmitinarray();
 void displaymitbyname();
+void addmitvacday(int index);
+bool datevalid(Date dateone, Date datetwo);
+bool lastdayinmonth(Date date);
+void increasedate(Date date);
 
 int main()
 {
@@ -241,11 +335,11 @@ int main()
 		int menu;
 		
 		cout << "++ Mitarbeiter database options ++" << endl;
-		cout << "(0) -- Quit Mitarbeiter database." << endl;
-		cout << "(1) -- Add new Mitarbeiter." << endl;
-		cout << "(2) -- " << endl;
+		cout << "(0) -- Quit Mitarbeiter database" << endl;
+		cout << "(1) -- Add new Mitarbeiter" << endl;
+		cout << "(2) -- Edit existing Mitarbeiter" << endl;
 		cout << "(3) -- " << endl;
-		cout << "(4) -- Display a Mitarbeiter by name." << endl;
+		cout << "(4) -- Display a Mitarbeiter by name" << endl;
 		cout << "(5) -- " << endl;
 		cout << "Choose an option: ";
 		cin >> menu;
@@ -291,7 +385,12 @@ int main()
 				addmittoarray();
 				break;
 			}
-			case 3: 
+			case 2:
+			{
+				editmitinarray();
+				break;
+			}
+			case 4: 
 			{
 				displaymitbyname();
 				break;
@@ -341,22 +440,209 @@ int searchmitbyname()
 		}
 	}
 
-	cout << "Mitarbeiter with the name " << ms << " " << mf << " doesn't exist." << endl;
+	cout << "Mitarbeiter with the name " << ms << " " << mf << " doesn't exist." << endl << endl;
 	return -1;
+}
+
+void editmitinarray()
+{
+	cout << "To edit a Mitarbeiter, please input the following..." << endl;
+	int index = searchmitbyname();
+
+	bool y = true;
+
+	do
+	{
+		int editmenu;
+
+		cout << "++ Mitarbeiter editing options ++" << endl;
+		cout << "**Surname(family name) and first name cannot be changed." << endl;
+		cout << "(0) -- Quit editing" << endl;
+		cout << "(1) -- Change date of birth" << endl;
+		cout << "(2) -- Change disability status" << endl;
+		cout << "(3) -- Add vacation days" << endl;
+		cout << "Choose an option: ";
+		cin >> editmenu;
+		cout << endl;
+
+		switch (editmenu)
+		{
+			case 0:
+			{
+				y = false;
+				break;	
+			}
+			case 1:
+			{
+				cout << "To change date of birth, please input the following..." << endl;
+				mitarbeiter[index].setgebdatum();
+				break;
+			}
+			case 2:
+			{
+				cout << "To change disability status, please input the following..." << endl;
+				mitarbeiter[index].setbeh();
+				break;
+			}
+			case 3: 
+			{
+				cout << "To add vacation days, please input the following..." << endl;
+				addmitvacday(index);
+				break;
+			}
+		}
+	}
+	while (y);
+}
+
+void addmitvacday(int index)
+{
+	cout << "First day of vacation...";
+	Date dateone = Date::createDate();
+	cout << "\nFirst day back to work...";
+	Date datetwo = Date::createDate();
+	Date gebdatum = mitarbeiter[index].getgebdatum();
+	mitarbeiter[index].setmaxulbtage();
+
+	if (!datevalid(dateone, datetwo))
+	{
+		cout << "Invalid set of dates..." << endl;
+		return;
+	}
+
+	while (mitarbeiter[index].getulbtage() < mitarbeiter[index].getmaxulbtage())
+	{
+		mitarbeiter[index].setulbtage(mitarbeiter[index].getulbtage() + 1);
+		increasedate(dateone);
+
+		if (!datevalid(dateone, datetwo))
+		{
+			break;
+		}
+		cout << dateone.getday() << endl;
+	}
+}
+
+bool datevalid(Date dateone, Date datetwo)
+{
+	int yone = dateone.getyear();
+	int mone = dateone.getmonth();
+	int done = dateone.getday();
+	int ytwo = datetwo.getyear();
+	int mtwo = datetwo.getmonth();
+	int dtwo = datetwo.getday();
+
+	if (yone < ytwo)
+	{
+		return true;
+	}
+	else if (yone == ytwo)
+	{
+		if (mone < mtwo)
+		{
+			return true;
+		}
+		else if (mone == mtwo)
+		{
+			if (done < dtwo)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool lastdayinmonth(Date date)
+{
+	int y = date.getyear();
+	int m = date.getmonth();
+	int d = date.getday();
+
+	if (m == 1 || m == 3 || m == 5 || m == 7 || m == 8 || m == 10 || m == 12)
+	{
+		if (d == 31)
+		{
+			return true;
+		}
+	}
+	else if (m == 4 || m == 6 || m == 9 || m == 11)
+	{
+		if (d == 30)
+		{
+			return true;
+		}
+	}
+	else if (m == 2)
+	{
+		if (y % 4 == 0 && !(y % 100 == 0 && y % 400 != 0))
+		{
+			if (d == 29)
+			{
+				return true;
+			}
+		}
+		else
+		{
+			if (d == 28)
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+void increasedate(Date date)
+{
+	int y = date.getyear();
+	int m = date.getmonth();
+	int d = date.getday();
+
+	if (lastdayinmonth(date))
+	{
+		if (m == 12)
+		{
+			date.setday(1);
+			date.setmonth(1);
+			date.setyear(y + 1);
+		}
+		else
+		{
+			date.setday(1);
+			date.setmonth(m + 1);
+		}
+	}
+	else
+	{
+		date.setday(d + 1);
+	}
 }
 
 void displaymitbyname()
 {
 	cout << "To display a Mitarbeiter, please input the following..." << endl;
 	int index = searchmitbyname();
-	Mitarbeiter mittbd = mitarbeiter[index];
 
 	if (index > -1 && index < 500)
 	{
+		Mitarbeiter mittbd = mitarbeiter[index];
 		cout << "\nMitarbeiter surname(family name): " << mittbd.getname() << endl;
 		cout << "Mitarbeiter first name: " << mittbd.getvorname() << endl;
-		cout << "Mitarbeiter date of birth: " << mittbd.getgebdatum() << endl;
+		cout << "Mitarbeiter date of birth: " << mittbd.getgebdatumstring() << endl;
 		cout << "Mitarbeiter degree of disability: " << mittbd.getbeh() << "%" << endl;
-		cout << "Mitarbeiter vacation day(s) left: " << mittbd.getulbtage() << endl;
+		cout << "Mitarbeiter vacation day(s) taken: " << mittbd.getulbtage() << endl << endl;
 	}
 }
