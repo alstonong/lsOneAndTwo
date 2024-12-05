@@ -282,27 +282,16 @@ void Mitarbeiter::setulbtage(int u)
 
 void Mitarbeiter::setmaxulbtage()
 {
-	if (gebdatum.getyear() + 50 > 2023)
+	maxulbtage = 30;
+
+	if (gebdatum.getyear() < 1974)
 	{
-		if (beh > 49)
-		{
-			maxulbtage = 37;
-		}
-		else
-		{
-			maxulbtage = 32;
-		}
+		maxulbtage += 2;
 	}
-	else
+
+	if (beh >= 50)
 	{
-		if (beh > 49)
-		{
-			maxulbtage = 35;
-		}
-		else
-		{
-			maxulbtage = 30;
-		}
+		maxulbtage += 5;
 	}
 }
 
@@ -315,11 +304,14 @@ Mitarbeiter mitarbeiter[500];
 void addmittoarray();
 int searchmitbyname();
 void editmitinarray();
-void displaymitbyname();
+void deletemitfromarray();
 void addmitvacday(int index);
 bool datevalid(Date dateone, Date datetwo);
 bool lastdayinmonth(Date date);
 void increasedate(Date date);
+void displaymitbyname();
+void bubblesortmitarraybyname();
+void listallmitsorted();
 
 int main()
 {
@@ -338,9 +330,9 @@ int main()
 		cout << "(0) -- Quit Mitarbeiter database" << endl;
 		cout << "(1) -- Add new Mitarbeiter" << endl;
 		cout << "(2) -- Edit existing Mitarbeiter" << endl;
-		cout << "(3) -- " << endl;
+		cout << "(3) -- Delete a Mitarbeiter" << endl;
 		cout << "(4) -- Display a Mitarbeiter by name" << endl;
-		cout << "(5) -- " << endl;
+		cout << "(5) -- List all Mitarbeiter [sorted by surname(family name)]" << endl;
 		cout << "Choose an option: ";
 		cin >> menu;
 		cout << endl;
@@ -390,14 +382,24 @@ int main()
 				editmitinarray();
 				break;
 			}
+			case 3:
+			{
+				deletemitfromarray();
+				break;
+			}
 			case 4: 
 			{
 				displaymitbyname();
 				break;
 			}
+			case 5:
+			{
+				listallmitsorted();
+				break;
+			}
 			default:
 			{
-				cout << "Invalid option. Loading options..." << endl << endl;
+				cout << "Invalid option. Loading valid options..." << endl << endl;
 				break;
 			}
 		}
@@ -440,7 +442,7 @@ int searchmitbyname()
 		}
 	}
 
-	cout << "Mitarbeiter with the name " << ms << " " << mf << " doesn't exist." << endl << endl;
+	cout << "Mitarbeiter with the name " << mf << " " << ms << " doesn't exist." << endl << endl;
 	return -1;
 }
 
@@ -448,6 +450,11 @@ void editmitinarray()
 {
 	cout << "To edit a Mitarbeiter, please input the following..." << endl;
 	int index = searchmitbyname();
+	
+	if (index == -1)
+	{
+		return;
+	}
 
 	bool y = true;
 
@@ -501,6 +508,8 @@ void addmitvacday(int index)
 	Date dateone = Date::createDate();
 	cout << "\nFirst day back to work...";
 	Date datetwo = Date::createDate();
+	cout << endl;
+
 	Date gebdatum = mitarbeiter[index].getgebdatum();
 	mitarbeiter[index].setmaxulbtage();
 
@@ -513,13 +522,33 @@ void addmitvacday(int index)
 	while (mitarbeiter[index].getulbtage() < mitarbeiter[index].getmaxulbtage())
 	{
 		mitarbeiter[index].setulbtage(mitarbeiter[index].getulbtage() + 1);
-		increasedate(dateone);
+		int y = dateone.getyear();
+		int m = dateone.getmonth();
+		int d = dateone.getday();
+
+		if (lastdayinmonth(dateone))
+		{
+			if (m == 12)		
+			{
+				dateone.setday(1);
+				dateone.setmonth(1);
+				dateone.setyear(y + 1);
+			}
+			else
+			{
+				dateone.setday(1);
+				dateone.setmonth(m + 1);
+			}
+		}
+		else
+		{
+			dateone.setday(d + 1);
+		}
 
 		if (!datevalid(dateone, datetwo))
 		{
 			break;
 		}
-		cout << dateone.getday() << endl;
 	}
 }
 
@@ -605,30 +634,12 @@ bool lastdayinmonth(Date date)
 	return false;
 }
 
-void increasedate(Date date)
+void deletemitfromarray()
 {
-	int y = date.getyear();
-	int m = date.getmonth();
-	int d = date.getday();
+	int index = searchmitbyname();
+	mitarbeiter[index] = Mitarbeiter();
 
-	if (lastdayinmonth(date))
-	{
-		if (m == 12)
-		{
-			date.setday(1);
-			date.setmonth(1);
-			date.setyear(y + 1);
-		}
-		else
-		{
-			date.setday(1);
-			date.setmonth(m + 1);
-		}
-	}
-	else
-	{
-		date.setday(d + 1);
-	}
+	cout << "\nMitarbeiter deleted." << endl << endl;
 }
 
 void displaymitbyname()
@@ -644,5 +655,45 @@ void displaymitbyname()
 		cout << "Mitarbeiter date of birth: " << mittbd.getgebdatumstring() << endl;
 		cout << "Mitarbeiter degree of disability: " << mittbd.getbeh() << "%" << endl;
 		cout << "Mitarbeiter vacation day(s) taken: " << mittbd.getulbtage() << endl << endl;
+	}
+}
+
+void bubblesortmitarraybyname()
+{
+	Mitarbeiter temp;
+
+	for (int i = 0; i < 499; ++i)
+	{
+		for (int j = 0; j < 498; ++j)
+		{
+			if (mitarbeiter[j].getname() > mitarbeiter[j + 1].getname())
+			{
+				temp = mitarbeiter[i];
+				mitarbeiter[i] = mitarbeiter[i + 1];
+				mitarbeiter[i + 1] = temp;
+			}
+		}
+	}
+}
+
+void listallmitsorted()
+{
+	bubblesortmitarraybyname();
+
+	int count = 1;
+	for (int i = 0; i < 500; i++)
+	{
+		if (mitarbeiter[i].getname() != "")
+		{
+			Mitarbeiter mittbd = mitarbeiter[i];
+			cout << count << ". ===============================" << endl;
+			cout << "Mitarbeiter surname(family name): " << mittbd.getname() << endl;
+			cout << "Mitarbeiter first name: " << mittbd.getvorname() << endl;
+			cout << "Mitarbeiter date of birth: " << mittbd.getgebdatumstring() << endl;
+			cout << "Mitarbeiter degree of disability: " << mittbd.getbeh() << "%" << endl;
+			cout << "Mitarbeiter vacation day(s) taken: " << mittbd.getulbtage() << endl << endl;
+			
+			count++;
+		}
 	}
 }
