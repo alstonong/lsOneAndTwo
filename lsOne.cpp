@@ -198,7 +198,7 @@ Mitarbeiter Mitarbeiter::createMitarbeiter()
 		}
 		else
 		{
-			cout << "New Mitarbeiter added." << endl << endl;
+			cout << "\nNew Mitarbeiter added." << endl << endl;
 			break;
 		}
 	}
@@ -512,6 +512,7 @@ void addmitvacday(int index)
 
 	Date gebdatum = mitarbeiter[index].getgebdatum();
 	mitarbeiter[index].setmaxulbtage();
+	int addeddaycount = 0;
 
 	if (!datevalid(dateone, datetwo))
 	{
@@ -519,9 +520,8 @@ void addmitvacday(int index)
 		return;
 	}
 
-	while (mitarbeiter[index].getulbtage() < mitarbeiter[index].getmaxulbtage())
+	while (true)
 	{
-		mitarbeiter[index].setulbtage(mitarbeiter[index].getulbtage() + 1);
 		int y = dateone.getyear();
 		int m = dateone.getmonth();
 		int d = dateone.getday();
@@ -545,10 +545,23 @@ void addmitvacday(int index)
 			dateone.setday(d + 1);
 		}
 
+		addeddaycount++;
+
 		if (!datevalid(dateone, datetwo))
 		{
 			break;
 		}
+	}
+
+	if (mitarbeiter[index].getulbtage() + addeddaycount <= mitarbeiter[index].getmaxulbtage() 
+			&& addeddaycount != 0) 
+	{
+		mitarbeiter[index].setulbtage(mitarbeiter[index].getulbtage() + addeddaycount);
+	}
+	else
+	{
+		cout << mitarbeiter[index].getname() << ", " << mitarbeiter[index].getvorname() << " doesn't have" 
+			<< " enough vacation days." << endl;
 	}
 }
 
@@ -664,13 +677,13 @@ void bubblesortmitarraybyname()
 
 	for (int i = 0; i < 499; ++i)
 	{
-		for (int j = 0; j < 498; ++j)
+		for (int j = 0; j < 499 - i; ++j)
 		{
 			if (mitarbeiter[j].getname() > mitarbeiter[j + 1].getname())
 			{
-				temp = mitarbeiter[i];
-				mitarbeiter[i] = mitarbeiter[i + 1];
-				mitarbeiter[i + 1] = temp;
+				temp = mitarbeiter[j];
+				mitarbeiter[j] = mitarbeiter[j + 1];
+				mitarbeiter[j + 1] = temp;
 			}
 		}
 	}
