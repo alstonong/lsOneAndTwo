@@ -3,8 +3,9 @@ using namespace std;
 
 //code written in Linux
 //code in Linux geschrieben
-//github.com/alstonong/lsOneAndTwo to view commits
+//github.com/alstonong/lsOneAndTwo to view all commits
 
+//class for creating and saving dates
 class Date
 {
 private: 
@@ -13,14 +14,17 @@ private:
 public: 
 	Date();
 	Date(int d, int m, int y); 
+	~Date();
 	static Date createDate();
 	int getday(), getmonth(), getyear();
 	void setday(int d), setmonth(int m), setyear(int y);
 };
 
+//class for creating and saving Mitarbeiters
 class Mitarbeiter
 {
 private:
+	//Task: saved name, vorname, geburtsdatum, grad der Behinderung, Bereits in Anspruch genommener Urlaub
 	string name, vorname;
 	Date gebdatum;
 	int beh, ulbtage, maxulbtage;
@@ -29,6 +33,7 @@ private:
 public: 
 	Mitarbeiter();
 	Mitarbeiter(string n, string v, Date g, int b, int u, int m, bool f); 
+	~Mitarbeiter();
 	static Mitarbeiter createMitarbeiter();
 	bool getfilled();
 	string getname(), getvorname(), getgebdatumstring();
@@ -37,12 +42,13 @@ public:
 	void setgebdatum(), setbeh(), setulbtage(int u), setmaxulbtage();
 };
 
-//Default constructor needed for creating default Mitarbeiter constructor
+//default Date constructor
 Date::Date() : day(0), month(0), year(0) {}
 
+//Date constructor with all date members as parameters
 Date::Date(int d, int m, int y) : day(d), month(m), year(y) {}
 
-//Factory function (learnt Chapter 7: page 7/8 in slide)
+//factory function for creating a Date object (learnt Chapter 7: page 7/8 in slide)
 Date Date::createDate()
 {
 	int d, m, y;
@@ -137,41 +143,55 @@ Date Date::createDate()
 	return Date(d, m, y);
 }
 
+//destructor for class Date
+Date::~Date() {}
+
+//day getter function from class Date
 int Date::getday()
 {
 	return day;
 }
 
+//month getter function from class Date
 int Date::getmonth()
 {
 	return month;
 }
 
+//year getter function from class Date
 int Date::getyear()
 {
 	return year;
 }
 
+//day setter function for class Date
+//takes an integer d as parameter to be set as day
 void Date::setday(int d)
 {
 	day = d;
 }
 
+//month setter function for class Date
+//takes an integer m as parameter to be set as month
 void Date::setmonth(int m)
 {
 	month = m;
 }
 
+//year setter function for class Date
+//takes an integer y as parameter to be set as year
 void Date::setyear(int y)
 {
 	year = y;
 }
 
-//Default constructor needed for creating Mitarbeiter array
+//default constructor needed for declaring mitarbeiter array
 Mitarbeiter::Mitarbeiter() : name(""), vorname(""), gebdatum(Date()), beh(0), ulbtage(0), maxulbtage(30), filled(false) {}
 
+//Mitarbeiter constructor with all Mitarbeiter data members 
 Mitarbeiter::Mitarbeiter(string n, string v, Date g, int b, int u, int m, bool f) : name(n), vorname(v), gebdatum(g), beh(b), ulbtage(u), maxulbtage(m), filled(f) {}; 
 
+//factory function for creating a Mitarbeiter object (learnt Chapter 7: page 7/8 in slide)
 Mitarbeiter Mitarbeiter::createMitarbeiter()
 {
 	string n, v;
@@ -207,16 +227,23 @@ Mitarbeiter Mitarbeiter::createMitarbeiter()
 	return Mitarbeiter(n, v, g, b, u, m, f);
 }
 
+//destructor for class Mitarbeiter
+Mitarbeiter::~Mitarbeiter() {}
+
+//name getter function from class Mitarbeiter
 string Mitarbeiter::getname()
 {
 	return name;
 }
 
+//vorname getter function from class Mitarbeiter
 string Mitarbeiter::getvorname()
 {
 	return vorname;
 }
 
+//gebdatum getter function from class Mitarbeiter
+//returns a string for the gebdatum date object in the form d/m/y
 string Mitarbeiter::getgebdatumstring()
 {
 	//to_string was used to convert int to string. Converting int to char would work but would require 
@@ -228,32 +255,40 @@ string Mitarbeiter::getgebdatumstring()
 	return gebstring;
 }
 
+//getbeh getter function from class Mitarbeiter
 int Mitarbeiter::getbeh()
 {
 	return beh;
 }
 
+//ulbtage getter function from class Mitarbeiter
 int Mitarbeiter::getulbtage()
 {
 	return ulbtage;
 }
 
+//gebdatum getter function from class Mitarbeiter
+//returns gebdatum which is an object of the Date class
 Date Mitarbeiter::getgebdatum()
 {
 	return gebdatum;
 }
 
+//getfilled getter function from class Mitarbeiter
 bool Mitarbeiter::getfilled()
 {
 	return filled;
 }
 
+//gebdatum setter function for class Mitarbeiter
 void Mitarbeiter::setgebdatum()
 {
 	gebdatum = Date::createDate();
-	cout << "Date of birth updated." << endl << endl;
+	cout << "\nDate of birth updated." << endl << endl;
 }
 
+//beh setter function for class Mitarbeiter
+//makes sure user is only allowed to set a value between 0 and 100
 void Mitarbeiter::setbeh()
 {
 	int b;
@@ -267,7 +302,7 @@ void Mitarbeiter::setbeh()
 		}
 		else
 		{
-			cout << "Degree of disability updated." << endl << endl;
+			cout << "\nDegree of disability updated." << endl << endl;
 			break;
 		}
 	}
@@ -275,42 +310,55 @@ void Mitarbeiter::setbeh()
 	beh = b;
 }
 
+//ulbtage setter function for class Mitarbeiter
+//takes an integer u as parameter to be set as ulbtage
 void Mitarbeiter::setulbtage(int u)
 {
 	ulbtage = u;
 }
 
+//sets ulbtage based on Mitarbeiter gebdatum and beh
 void Mitarbeiter::setmaxulbtage()
 {
+	//Task: Every employee is entitled to 30 days vacation
 	maxulbtage = 30;
 
+	//Task: Employees turned 50 by January 1st 2024 receive 32 days vacation
 	if (gebdatum.getyear() < 1974)
 	{
 		maxulbtage += 2;
 	}
 
+	//Task: Employees with a degree of disability of at least 50% receive an additional 5 days vacation
 	if (beh >= 50)
 	{
 		maxulbtage += 5;
 	}
 }
 
+//maxulbtage getter function from class Mitarbeiter
 int Mitarbeiter::getmaxulbtage()
 {
 	return maxulbtage;
 }
 
+//Task: array to store 500 Mitarbeiter objects
 Mitarbeiter mitarbeiter[500];
+//all function are defined below int main()
+//Task: creation of a Mitarbeiter object
 void addmittoarray();
 int searchmitbyname();
 void editmitinarray();
+//Task: deletion of a Mitarbeiter object
 void deletemitfromarray();
+//Task: entering Mitarbeiter object vacation days by date input
 void addmitvacday(int index);
 bool datevalid(Date dateone, Date datetwo);
 bool lastdayinmonth(Date date);
-void increasedate(Date date);
+//Task: searching for Mitarbeiter object with output of his data and displays vacation he has left
 void displaymitbyname();
 void bubblesortmitarraybyname();
+//Task: list all stored Mitarbeiter object data
 void listallmitsorted();
 
 int main()
@@ -329,7 +377,7 @@ int main()
 		cout << "++ Mitarbeiter database options ++" << endl;
 		cout << "(0) -- Quit Mitarbeiter database" << endl;
 		cout << "(1) -- Add new Mitarbeiter" << endl;
-		cout << "(2) -- Edit existing Mitarbeiter" << endl;
+		cout << "(2) -- Edit existing Mitarbeiter/Add vacation" << endl;
 		cout << "(3) -- Delete a Mitarbeiter" << endl;
 		cout << "(4) -- Display a Mitarbeiter by name" << endl;
 		cout << "(5) -- List all Mitarbeiter [sorted by surname(family name)]" << endl;
@@ -411,6 +459,7 @@ int main()
 	return 0;
 }
 
+//adds a Mitarbeiter object to the mitarbeiter array
 void addmittoarray()
 {
 	for (int i = 0; i < 500; i++)
@@ -423,6 +472,7 @@ void addmittoarray()
 	}
 }
 
+//searches for a Mitarbeiter object in the mitarbeiter array by input of name and vorname
 int searchmitbyname()
 {
 	string ms, mf;
@@ -446,10 +496,12 @@ int searchmitbyname()
 	return -1;
 }
 
+//shows user options to edit a Mitarbeiter object in mitarbeiter array
 void editmitinarray()
 {
 	cout << "To edit a Mitarbeiter, please input the following..." << endl;
 	int index = searchmitbyname();
+	cout << endl;
 	
 	if (index == -1)
 	{
@@ -502,6 +554,7 @@ void editmitinarray()
 	while (y);
 }
 
+//allows user to add vacation days by input of the start and end days of said vacation
 void addmitvacday(int index)
 {
 	cout << "First day of vacation...";
@@ -514,6 +567,7 @@ void addmitvacday(int index)
 	mitarbeiter[index].setmaxulbtage();
 	int addeddaycount = 0;
 
+	//makes sure second day isn't smaller than the first
 	if (!datevalid(dateone, datetwo))
 	{
 		cout << "Invalid set of dates..." << endl;
@@ -553,18 +607,23 @@ void addmitvacday(int index)
 		}
 	}
 
+	//checks if ulbtage and extra vacation days exceed maxulbtage
+	//if yes, extra vacation days will not be added
 	if (mitarbeiter[index].getulbtage() + addeddaycount <= mitarbeiter[index].getmaxulbtage() 
 			&& addeddaycount != 0) 
 	{
 		mitarbeiter[index].setulbtage(mitarbeiter[index].getulbtage() + addeddaycount);
+		cout << addeddaycount << " vacation days added." << endl << endl;
 	}
 	else
 	{
-		cout << mitarbeiter[index].getname() << ", " << mitarbeiter[index].getvorname() << " doesn't have" 
-			<< " enough vacation days." << endl;
+		cout << endl << mitarbeiter[index].getname() << ", " << mitarbeiter[index].getvorname() << " doesn't"
+			<< " have enough vacation days." << endl << endl;
 	}
 }
 
+//helper function for addmitvaday() to see if dateone is actually smaller than datetwo
+//requires two Date objects as parameters to be compared
 bool datevalid(Date dateone, Date datetwo)
 {
 	int yone = dateone.getyear();
@@ -606,6 +665,8 @@ bool datevalid(Date dateone, Date datetwo)
 	}
 }
 
+//helper function to check if the day is the last day in the month
+//takes a Date as a parameter and returns true or false
 bool lastdayinmonth(Date date)
 {
 	int y = date.getyear();
@@ -647,6 +708,7 @@ bool lastdayinmonth(Date date)
 	return false;
 }
 
+//deletes a Mitarbeiter object from mitarbeiter array
 void deletemitfromarray()
 {
 	int index = searchmitbyname();
@@ -655,6 +717,8 @@ void deletemitfromarray()
 	cout << "\nMitarbeiter deleted." << endl << endl;
 }
 
+//shows user data of a Mitarbeiter object from the mitarbeiter array
+//will prompt user for name and vorname
 void displaymitbyname()
 {
 	cout << "To display a Mitarbeiter, please input the following..." << endl;
@@ -663,14 +727,18 @@ void displaymitbyname()
 	if (index > -1 && index < 500)
 	{
 		Mitarbeiter mittbd = mitarbeiter[index];
+		cout << "========== Displaying Mitarbeiter ==========" << endl;
 		cout << "\nMitarbeiter surname(family name): " << mittbd.getname() << endl;
 		cout << "Mitarbeiter first name: " << mittbd.getvorname() << endl;
 		cout << "Mitarbeiter date of birth: " << mittbd.getgebdatumstring() << endl;
 		cout << "Mitarbeiter degree of disability: " << mittbd.getbeh() << "%" << endl;
-		cout << "Mitarbeiter vacation day(s) taken: " << mittbd.getulbtage() << endl << endl;
+		cout << "Mitarbeiter vacation day(s) taken: " << mittbd.getulbtage() << endl;
+		cout << "Mitarbeiter vacation day(s) remaining: " << mittbd.getmaxulbtage() - mittbd.getulbtage() 
+			<< endl << endl;
 	}
 }
 
+//bubble sorts the mitarbeiter array by name
 void bubblesortmitarraybyname()
 {
 	Mitarbeiter temp;
@@ -689,6 +757,7 @@ void bubblesortmitarraybyname()
 	}
 }
 
+//lists all Mitarbeiter objects in the mitarbeiter array that have the data "filled" as true bubble sorted by name
 void listallmitsorted()
 {
 	bubblesortmitarraybyname();
@@ -696,7 +765,7 @@ void listallmitsorted()
 	int count = 1;
 	for (int i = 0; i < 500; i++)
 	{
-		if (mitarbeiter[i].getname() != "")
+		if (mitarbeiter[i].getfilled())
 		{
 			Mitarbeiter mittbd = mitarbeiter[i];
 			cout << count << ". ===============================" << endl;
@@ -704,7 +773,9 @@ void listallmitsorted()
 			cout << "Mitarbeiter first name: " << mittbd.getvorname() << endl;
 			cout << "Mitarbeiter date of birth: " << mittbd.getgebdatumstring() << endl;
 			cout << "Mitarbeiter degree of disability: " << mittbd.getbeh() << "%" << endl;
-			cout << "Mitarbeiter vacation day(s) taken: " << mittbd.getulbtage() << endl << endl;
+			cout << "Mitarbeiter vacation day(s) taken: " << mittbd.getulbtage() << endl;
+			cout << "Mitarbeiter vacation day(s) remaining: " 
+				<< mittbd.getmaxulbtage() - mittbd.getulbtage() << endl << endl;
 			
 			count++;
 		}
