@@ -28,6 +28,7 @@ public:
 	void setmotorcycle(string m);
 	friend istream& operator>>(istream& is, Customer& c);
 	friend ostream& operator<<(ostream& os, const Customer& c);
+	friend bool operator<(const Customer& cone, const Customer& ctwo);
 };
 
 class Motorcycle
@@ -61,6 +62,7 @@ Customer Customer::createCustomer()
 	{
 		cout << "Customer surname: ";
 		cin >> n;
+		cin.ignore(10000, '\n');
 		if (n.empty())
 		{
 			cout << "Still need a surname..." << endl;
@@ -69,13 +71,15 @@ Customer Customer::createCustomer()
 		{
 			break;
 		}
-	} while (true);
+	} 
+	while (true);
 
 	do
 	{
 		cout << "Customer first name: ";
 		cin >> v;
-		if (n.empty())
+		cin.ignore(10000, '\n');
+		if (v.empty())
 		{
 			cout << "First name is a compulsory field..." << endl;
 		}
@@ -83,13 +87,14 @@ Customer Customer::createCustomer()
 		{
 			break;
 		}
-	} while (true);
+	} 
+	while (true);
 
 	do
 	{
 		cout << "Customer telephone number: ";
-		cin >> t;
-		if (n.empty())
+		getline(cin, t);
+		if (t.empty())
 		{
 			cout << "Need a number to contact you..." << endl;
 		}
@@ -97,13 +102,14 @@ Customer Customer::createCustomer()
 		{
 			break;
 		}
-	} while (true);
+	} 
+	while (true);
 		
 	do
 	{
 		cout << "Customer address: ";
-		cin >> a;
-		if (n.empty())
+		getline(cin, a);
+		if (a.empty())
 		{
 			cout << "I won't go to your house. Promise..." << endl;
 		}
@@ -111,7 +117,8 @@ Customer Customer::createCustomer()
 		{
 			break;
 		}
-	} while (true);
+	} 
+	while (true);
 
 	do
 	{
@@ -124,8 +131,11 @@ Customer Customer::createCustomer()
 		else
 		{
 			cout << "Still need the year of birth..." << endl;
+			cin.clear();
+			cin.ignore(10000, '\n');
 		}
-	} while (true);
+	} 
+	while (true);
 
 	char userchar;
 	do
@@ -148,7 +158,8 @@ Customer Customer::createCustomer()
 		{
 			cout << "Surely it's not hard to enter a letter..." << endl;
 		}
-	} while (true);
+	} 
+	while (true);
 	
 	m = "none";
 
@@ -221,9 +232,19 @@ istream& operator>>(istream& is, Customer& c)
 
 ostream& operator<<(ostream& os, const Customer& c)
 {
-	os << c.name << endl << c.vorname << endl << c.telefonnummer << endl 
-		<< c.addresse << endl << c.motorcycle << endl << c.geburtsjahr << endl << c.fuhrerscheina << endl;
+	os << c.name << '\n'
+		<< c.vorname << '\n'
+		<< c.telefonnummer << '\n'
+		<< c.addresse << '\n'
+		<< c.motorcycle << '\n'
+		<< c.geburtsjahr << '\n'
+		<< c.fuhrerscheina << '\n';
 	return os;
+}
+
+bool operator<(const Customer& cone, const Customer& ctwo)
+{
+	return cone.name < ctwo.name;
 }
 
 Motorcycle::Motorcycle() : name(""), rented(false) {}
@@ -262,6 +283,7 @@ istream& operator>>(istream& is, Motorcycle& m)
 {
 	getline(is, m.name);
 	string r;
+	getline(is, r);
 	if (r == "1")
 	{
 		m.rented = true;
@@ -275,7 +297,7 @@ istream& operator>>(istream& is, Motorcycle& m)
 
 ostream& operator<<(ostream& os, const Motorcycle& m)
 {
-	os << m.name << endl << m.rented << endl;
+	os << m.name << '\n' << m.rented << '\n';
 	return os;
 }
 
@@ -289,6 +311,7 @@ list<Motorcycle> motorcyclelist;
 void addcustomer();
 void rentmotorcycle();
 void displayallcustomer();
+void displaycustomerrentstatus();
 void addmotorcycle();
 void displayallmotorcycle();
 int searchcustomer();
@@ -299,43 +322,55 @@ int main()
 	cout << "| Welcome to Motorcycle Management database |" << endl;
 	cout << "=============================================" << endl << endl << endl;
 
-	ifstream inputfile("reservierungen.txt", ios::in);
+	ifstream checkfile("reservierungen.txt", ios::in);
+	ifstream inputfile;
 	Customer inputcustomer;
 	Motorcycle inputmotorcycle;
-	string inputline;
-	while (getline(inputfile, inputline))
+
+	if (!checkfile.is_open())
 	{
-		if (inputline == "*")
-		{
-			break;
-		}
-		else
-		{
-			inputfile.putback('\n');
-			inputfile.seekg(-inputline.length(), ios::cur);
-			inputfile >> inputcustomer;
-			customerlist.push_back(inputcustomer);
-		}
+		ofstream newfile("reservierungen.txt", ios::out);
+		newfile << "*" << endl;
+		inputmotorcycle = Motorcycle("Suzuki GSX-8S");
+		newfile << inputmotorcycle;
+		inputmotorcycle = Motorcycle("Honda TransAlp");
+		newfile << inputmotorcycle;
+		inputmotorcycle = Motorcycle("BMW F 650 GS");
+		newfile << inputmotorcycle;
+		inputmotorcycle = Motorcycle("Ducati Streetfighter V4");
+		newfile << inputmotorcycle;
+		newfile << "*" << endl;
 	}
 
-	while (getline(inputfile, inputline)) 
+	inputfile.open("reservierungen.txt", ios::in);
+
+	while (true)
 	{
-		if (inputline == "")
+		if (inputfile.peek() == '*')
 		{
+			string discard;
+			getline(inputfile, discard);
 			break;
 		}
-		else
-		{
-			inputfile.putback('\n');
-			cout << "1";
-			inputfile.seekg(-inputline.length(), ios::cur);
-			cout << "2";
-			inputfile >> inputmotorcycle;
-			cout << "3";
-			motorcyclelist.push_back(inputmotorcycle);
-			cout << "4";
-		}
+
+		inputfile >> inputcustomer;
+		customerlist.push_back(inputcustomer);
 	}
+
+	while(true)
+	{
+		if (inputfile.peek() == '*')
+		{
+			string discard;
+			getline(inputfile, discard);
+			break;
+		}
+
+		inputfile >> inputmotorcycle;
+		motorcyclelist.push_back(inputmotorcycle);
+	}
+
+	inputfile.close();
 
 	bool z = true;
 	do 
@@ -421,6 +456,8 @@ int main()
 		outputfile << motorcycle;
 	}
 
+	outputfile << "*" << endl;
+
 	outputfile.close();
 
 	cout << "Grab a coffee...program terminated..." << endl << endl;
@@ -437,10 +474,16 @@ void addcustomer()
 
 void rentmotorcycle()
 {
-	Customer c;
-	Motorcycle m;
-	int icustomer = searchcustomer();
+	Customer* c = nullptr;
+	Motorcycle* m = nullptr;
+	displaycustomerrentstatus();
+	int icustomer;
 	int imotorcycle;
+	cout << "Enter -1 to add a customer...\n";
+	cout << "Customer number: ";
+	cin >> icustomer;
+	icustomer--;
+	cout << "\n";
 
 	do
 	{	
@@ -448,32 +491,36 @@ void rentmotorcycle()
 		{
 			auto cstep = customerlist.begin();
 			advance(cstep, icustomer);
-			c = *cstep;
+			c = &(*cstep);
 			break;
 		}
 		else if (icustomer == -1)
 		{
-			cout << "This customer does not exist." << endl;
+			cout << "Adding new customer..." << endl;
+			cin.ignore(10000, '\n');
 			addcustomer();
-			c = customerlist.back();
+			c = &customerlist.back();
 			break;
 		}
 		else
 		{
-			cout << "Unknown error...";
+			cout << "Unknown error...\n\n";
+			cin.clear();
+			cin.ignore(10000, '\n');
 			return;
 		}
-	} while (true);
+	} 
+	while (true);
 
-	if (!c.getfuhrerscheina())
+	if (!c->getfuhrerscheina())
 	{
-		cout << c.getname() << ", " << c.getvorname() << " does not possess a motorcycle license (class A)." << endl << endl; 
+		cout << c->getname() << ", " << c->getvorname() << " does not possess a motorcycle license (class A)." << endl << endl; 
 		return;
 	}
 
-	if (c.getmotorcycle() != "")
+	if (c->getmotorcycle() != "none")
 	{
-		cout << c.getname() << ", " << c.getvorname() << " is already renting a motorcycle." << endl << endl;
+		cout << c->getname() << ", " << c->getvorname() << " is already renting a motorcycle." << endl << endl;
 		return;
 	}
 
@@ -485,11 +532,12 @@ void rentmotorcycle()
 			cout << "Motorcycle option[input choice number] OR 0 to cancel reservation: ";
 			cin >> imotorcycle;
 
-			if (imotorcycle == 0)
+			if (imotorcycle == -1)
 			{
+				cout << "Reservation cancelled." << endl;
 				return;
 			}
-			else if (imotorcycle > 0 && imotorcycle <= motorcyclelist.size())
+			else if (imotorcycle > -1 && imotorcycle <= motorcyclelist.size())
 			{
 				break;
 			}
@@ -500,23 +548,28 @@ void rentmotorcycle()
 		}
 		while (true);
 		
+		imotorcycle--;
 		auto mstep = motorcyclelist.begin();
-		advance(mstep, imotorcycle - 1);
-		m = *mstep;
+		advance(mstep, imotorcycle);
+		m = &(*mstep);
 
-		if (!m.getrented())
+		if (!m->getrented())
 		{
+			cout << "Motorcycle rented..." << endl;
 			break;
 		}
+
+		cout << "Motorcycle is not available for rent..." << endl;
 	}
 	while (true);
 
-	c.setmotorcycle(m.getname());
-	m.rentm();
+	c->setmotorcycle(m->getname());
+	m->rentm();
 }
 
 void displayallcustomer()
 {
+	customerlist.sort();
 	int count = 1;
 	for (const Customer& customer : customerlist)
 	{
@@ -525,6 +578,7 @@ void displayallcustomer()
 		cout << "First name: " << customer.getvorname() << endl;
 		cout << "Telephone numebr: " << customer.gettelefonnummer() << endl;
 		cout << "Address: " << customer.getaddresse() << endl;
+		cout << "Current motorcycle rented: " << customer.getmotorcycle() << endl;
 		cout << "Year of birth: " << customer.getgeburtsjahr() << endl;
 		if (customer.getfuhrerscheina())
 		{
@@ -535,6 +589,28 @@ void displayallcustomer()
 			cout << "Motorcycle license (class A) possession: No" << endl;
 		}
 		cout << endl;
+		count++;
+	}
+	cout << endl;
+}
+
+void displaycustomerrentstatus()
+{
+	customerlist.sort();
+	int count = 1;
+	for (const Customer& customer : customerlist)
+	{
+		cout << "(" << count << ") " << customer.getname() << ", " << customer.getvorname() << " || "
+		<< "Current motorcycle rented: " << customer.getmotorcycle() << " || ";
+		if (customer.getfuhrerscheina())
+		{
+			cout << "Motorcycle license (class A) possession: Yes" << endl;
+		}
+		else
+		{
+			cout << "Motorcycle license (class A) possession: No" << endl;
+		}
+		count++;
 	}
 	cout << endl;
 }
@@ -562,11 +638,13 @@ void displayallmotorcycle()
 			cout << motorcycle.getname() << " || Status: Available";
 		}
 		cout << endl;
+		count ++;
 	}
 	cout << endl;
 }
 
-int searchcustomer()
+/*
+void searchcustomer()
 {
 	string s, f;
 	cout << "Search by surname[case sensitive]: ";
@@ -580,10 +658,9 @@ int searchcustomer()
 	{
 		if (s == customer.getname() && f == customer.getvorname())
 		{
-			return index;
+
 		}
 		index++;
 	}
-
-	return -1;
 }
+*/
