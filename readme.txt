@@ -2,7 +2,7 @@ LS1
 ---
 Description
 - One of the two projects required to take exam. 
-- The program is a Mitarbeiter database that manages Mitarbeiter information, particularly vacation dates. There are multiple features such as creating/deleting, editing, adding vacation days, etc for each Mitarbeiter.
+- The program is a customer database that manages reservation information. There are multiple features such as creating/deleting customers and motorcycles, editing customer information, adding motorcycle reservations, etc.
 
 Prerequisites
 - C++
