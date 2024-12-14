@@ -1,4 +1,4 @@
-LS1
+LS2
 ---
 Description
 - One of the two projects required to take exam. 
